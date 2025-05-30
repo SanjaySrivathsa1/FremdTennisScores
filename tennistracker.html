@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JV Tennis Team Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: white;
+            color: #2c3e50;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .record, .percentage, .count {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-container form {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .form-container input, .form-container select {
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+
+        .form-container input:focus, .form-container select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .player-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .player-card h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .player-info {
+            margin-bottom: 1rem;
+        }
+
+        .player-position {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .player-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .delete-player {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .match-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .match-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            border-left: 5px solid #3498db;
+            position: relative;
+        }
+
+        .match-card.win {
+            border-left-color: #27ae60;
+        }
+
+        .match-card.loss {
+            border-left-color: #e74c3c;
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .match-result {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .match-result.win {
+            background: #27ae60;
+        }
+
+        .match-result.loss {
+            background: #e74c3c;
+        }
+
+        .match-position {
+            background: #f8f9fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: #495057;
+            margin-left: 1rem;
+        }
+
+        .delete-match {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .recent-matches {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .no-data {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+            
+            main {
+                padding: 0 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .players-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-container form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎾 JV Tennis Team Tracker</h1>
+        <nav>
+            <button class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
+            <button class="nav-btn" onclick="showSection('players')">Players</button>
+            <button class="nav-btn" onclick="showSection('matches')">Matches</button>
+            <button class="nav-btn" onclick="showSection('add-match')">Add Match</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <h2>Team Dashboard</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Team Record</h3>
+                    <div class="record" id="team-record">0-0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Win Percentage</h3>
+                    <div class="percentage" id="win-percentage">0%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Players</h3>
+                    <div class="count" id="total-players">1</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Matches Played</h3>
+                    <div class="count" id="total-matches">0</div>
+                </div>
+            </div>
+            
+            <div class="recent-matches">
+                <h3>Recent Matches</h3>
+                <div id="recent-matches-list"></div>
+            </div>
+        </section>
+
+        <!-- Players Section -->
+        <section id="players" class="section">
+            <div class="section-header">
+                <h2>Players</h2>
+                <button class="btn btn-primary" onclick="showAddPlayerForm()">Add Player</button>
+            </div>
+            
+            <div id="add-player-form" class="form-container" style="display: none;">
+                <h3>Add New Player</h3>
+                <form onsubmit="addPlayer(event)">
+                    <input type="text" id="player-name" placeholder="Player Name" required>
+                    <input type="text" id="player-grade" placeholder="Grade" required>
+                    <select id="player-position" required>
+                        <option value="">Select Position</option>
+                        <option value="Singles 1">Singles 1</option>
+                        <option value="Singles 2">Singles 2</option>
+                        <option value="Singles 3">Singles 3</option>
+                        <option value="Doubles 1">Doubles 1</option>
+                        <option value="Doubles 2">Doubles 2</option>
+                        <option value="Doubles 3">Doubles 3</option>
+                        <option value="Doubles 4">Doubles 4</option>
+                        <option value="Exhibition">Exhibition</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Add Player</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideAddPlayerForm()">Cancel</button>
+                </form>
+            </div>
+
+            <div class="players-grid" id="players-list"></div>
+        </section>
+
+        <!-- Matches Section -->
+        <section id="matches" class="section">
+            <h2>Match History</h2>
+            <div class="matches-list" id="matches-list"></div>
+        </section>
+
+        <!-- Add Match Section -->
+        <section id="add-match" class="section">
+            <h2>Add New Match</h2>
+            <form class="match-form" onsubmit="addMatch(event)">
+                <div class="form-group">
+                    <label for="opponent">Opponent School:</label>
+                    <input type="text" id="opponent" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="match-date">Date:</label>
+                    <input type="date" id="match-date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="match-type">Match Type:</label>
+                    <select id="match-type" required>
+                        <option value="singles">Singles</option>
+                        <option value="doubles">Doubles</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="position">Team Position:</label>
+                    <select id="position" required>
+                        <option value

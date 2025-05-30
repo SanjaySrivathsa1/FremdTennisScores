@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JV Tennis Team Tracker</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #f5f5f5; 
+            color: #333; 
+            margin: 0; 
+            padding: 20px;
+        }
+        header { 
+            background: #3498db; 
+            color: white; 
+            padding: 1rem; 
+            text-align: center; 
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .team-record {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .team-record h2 {
+            color: #3498db;
+            margin-top: 0;
+        }
+        .team-stats {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        .team-win-rate {
+            color: #27ae60;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .selector {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 200px;
+        }
+        .player-card { 
+            background: white; 
+            padding: 1.5rem; 
+            margin: 1rem 0; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            display: none;
+        }
+        .player-card.active {
+            display: block;
+        }
+        .player-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 20px auto;
+            display: block;
+            border: 4px solid #3498db;
+        }
+        .record {
+            font-size: 24px;
+            font-weight: bold;
+            color: #006400;
+            margin: 10px 0;
+        }
+        .win-rate {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .stats {
+            color: #666;
+            margin-top: 10px;
+        }
+        .match-history {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .match-history h4 {
+            color: #006400;
+            margin-bottom: 10px;
+        }
+        .match {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .match.win {
+            background: #d5f4e6;
+            border-left: 4px solid #27ae60;
+        }
+        .match.loss {
+            background: #fdeaea;
+            border-left: 4px solid #e74c3c;
+        }
+        .match-result {
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 3px;
+            color: white;
+        }
+        .match-result.win {
+            background: #27ae60;
+        }
+        .match-result.loss {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎾 JV Tennis Team Tracker</h1>
+    </header>
+
+    <div class="team-record">
+        <h2>Team Record</h2>
+        <div class="team-stats" id="team-record">0-0</div>
+        <div class="team-win-rate" id="team-win-rate">Win Rate: 0%</div>
+        <p id="team-details">Total Games: 0</p>
+    </div>
+
+    <div class="selector">
+        <h3>Select a Player</h3>
+        <select id="player-select" onchange="showPlayer()">
+            <option value="">Choose a player...</option>
+            <option value="0">Sanjay Srivathsa</option>
+            <option value="1">Aashay Shah</option>
+            <option value="2">Daniel Choi</option>
+        </select>
+    </div>
+
+    <main>
+        <div id="players-list">
+            <!-- Player cards will appear here -->
+        </div>
+    </main>
+
+    <script>
+        // UPDATE SCORES AND MATCHES HERE
+        const players = [
+            { 
+                name: 'Sanjay Srivathsa', 
+                wins: 5, 
+                losses: 2,
+                photo: 'images/sanjayphoto.png',
+                matches: [
+                    { opponent: 'Lincoln High', result: 'W' },
+                    { opponent: 'Roosevelt Academy', result: 'W' },
+                    { opponent: 'Washington Prep', result: 'L' },
+                    { opponent: 'Jefferson High', result: 'W' },
+                    { opponent: 'Madison School', result: 'W' },
+                    { opponent: 'Hamilton Academy', result: 'L' },
+                    { opponent: 'Adams High', result: 'W' }
+                ]
+            },
+            { 
+                name: 'Aashay Shah', 
+                wins: 3, 
+                losses: 4,
+                photo: 'images/aashay.jpg',
+                matches: [
+                    { opponent: 'Lincoln High', result: 'L' },
+                    { opponent: 'Roosevelt Academy', result: 'W' },
+                    { opponent: 'Washington Prep', result: 'L' },
+                    { opponent: 'Jefferson High', result: 'L' },
+                    { opponent: 'Madison School', result: 'W' },
+                    { opponent: 'Hamilton Academy', result: 'W' },
+                    { opponent: 'Adams High', result: 'L' }
+                ]
+            },
+            { 
+                name: 'Daniel Choi', 
+                wins: 7, 
+                losses: 1,
+                photo: 'images/daniel.jpg',
+                matches: [
+                    { opponent: 'Lincoln High', result: 'W' },
+                    { opponent: 'Roosevelt Academy', result: 'W' },
+                    { opponent: 'Washington Prep', result: 'W' },
+                    { opponent: 'Jefferson High', result: 'W' },
+                    { opponent: 'Madison School', result: 'L' },
+                    { opponent: 'Hamilton Academy', result: 'W' },
+                    { opponent: 'Adams High', result: 'W' },
+                    { opponent: 'Monroe Prep', result: 'W' }
+                ]
+            }
+        ];
+
+        function calculateTeamRecord() {
+            const totalWins = players.reduce((sum, player) => sum + player.wins, 0);
+            const totalLosses = players.reduce((sum, player) => sum + player.losses, 0);
+            const totalGames = totalWins + totalLosses;
+            const teamWinRate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
+
+            document.getElementById('team-record').textContent = `${totalWins}-${totalLosses}`;
+            document.getElementById('team-win-rate').textContent = `Win Rate: ${teamWinRate}%`;
+            document.getElementById('team-details').textContent = `Total Games: ${totalGames}`;
+        }
+
+        function renderMatchHistory(matches) {
+            return matches.map(match => `
+                <div class="match ${match.result.toLowerCase() === 'w' ? 'win' : 'loss'}">
+                    <span>vs ${match.opponent}</span>
+                    <span class="match-result ${match.result.toLowerCase() === 'w' ? 'win' : 'loss'}">
+                        ${match.result}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function renderPlayers() {
+            const list = document.getElementById('players-list');
+            list.innerHTML = '';
+            
+            players.forEach((player, index) => {
+                const totalGames = player.wins + player.losses;
+                const winRate = totalGames > 0 ? 
+                    Math.round((player.wins / totalGames) * 100) : 0;
+                
+                const card = document.createElement('div');
+                card.className = 'player-card';
+                card.id = `player-${index}`;
+                card.innerHTML = `
+                    <img src="${player.photo}" alt="${player.name}" class="player-photo" onerror="this.src='https://via.placeholder.com/200x200/3498db/ffffff?text=${player.name.split(' ')[0]}'">
+                    <h3>${player.name}</h3>
+                    <div class="record">${player.wins}-${player.losses}</div>
+                    <div class="stats">
+                        <p>Total Games: ${totalGames}</p>
+                        <p class="win-rate">Win Rate: ${winRate}%</p>
+                    </div>
+                    <div class="match-history">
+                        <h4>Match History</h4>
+                        ${renderMatchHistory(player.matches)}
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function showPlayer() {
+            const select = document.getElementById('player-select');
+            const selectedIndex = select.value;
+            
+            // Hide all player cards
+            const allCards = document.querySelectorAll('.player-card');
+            allCards.forEach(card => card.classList.remove('active'));
+            
+            // Show selected player card
+            if (selectedIndex !== '') {
+                document.getElementById(`player-${selectedIndex}`).classList.add('active');
+            }
+        }
+
+        // Initialize the page
+        renderPlayers();
+        calculateTeamRecord();
+    </script>
+</body>
+</html>
+
